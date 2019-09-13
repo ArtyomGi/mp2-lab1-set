@@ -5,10 +5,14 @@
 //
 // Битовое поле
 
+
+
 #include "tbitfield.h"
 
 TBitField::TBitField(int len)
 {
+	//realisation
+	
 }
 
 TBitField::TBitField(const TBitField &bf) // конструктор копирования
