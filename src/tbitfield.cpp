@@ -21,16 +21,18 @@ TBitField::TBitField(int len)
 
 TBitField::TBitField(const TBitField &bf) // конструктор копирования
 {
-	BitLen = bf.BitLen;
-	MemLen = bf.MemLen;
-	pMem = new TELEM[MemLen];
-	for (int i = 0; i < MemLen; i++)
-		pMem[i] = bf.pMem[i];
+	if (&bf != this)
+	{
+		BitLen = bf.BitLen;
+		MemLen = bf.MemLen;
+		pMem = new TELEM[MemLen];
+		for (int i = 0; i < MemLen; i++)
+			pMem[i] = bf.pMem[i];
+	}
 }
 
 TBitField::~TBitField()
 {
-	BitLen = 0;
 	delete[] pMem;
 }
 
@@ -79,6 +81,7 @@ int TBitField::GetBit(const int n) const // получить значение б
 
 TBitField& TBitField::operator=(const TBitField &bf) // присваивание
 {
+	if(&bf == this) return *this;
 	if (BitLen != bf.BitLen) { // перевыделение памяти
 		BitLen = bf.BitLen;
 		MemLen = bf.MemLen;
@@ -95,18 +98,10 @@ TBitField& TBitField::operator=(const TBitField &bf) // присваивание
 
 int TBitField::operator==(const TBitField &bf) const // сравнение
 {
-	/*if (BitLen != bf.BitLen) return 0;
+	if (BitLen != bf.BitLen) return 0;
 	for (int i = 0; i < MemLen; i++)
-	{
 		if (pMem[i] != bf.pMem[i]) return 0;
-	}
-	return 1;*/
-	if (MemLen == bf.MemLen)
-	{
-		for (int i = 0; i < MemLen; i++)
-			if (pMem[i] != bf.pMem[i]) return 0;
-	}
-	else if (bf.MemLen < MemLen)
+	/*else if (bf.MemLen < MemLen)
 	{
 		for (int i = 0; i < bf.MemLen; i++)
 			if (pMem[i] != bf.pMem[i]) return 0;
@@ -119,7 +114,7 @@ int TBitField::operator==(const TBitField &bf) const // сравнение
 			if (pMem[i] != bf.pMem[i]) return 0;
 		for (int i = MemLen; i < bf.MemLen; i++)
 			if (bf.pMem[i]) return 0;
-	}
+	}*/
 	return 1;
 }
 
@@ -181,10 +176,6 @@ TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 			ret.pMem[i] = pMem[i] & bf.pMem[i];
 	}
 
-
-
-	//TBitField ret()
-
 	return ret;
 }
 
@@ -192,7 +183,10 @@ TBitField TBitField::operator~(void) // отрицание
 {
 	TBitField ret(BitLen);
 
-	for (int i = 0; i < BitLen; i++)
+	for (int i = 0; i < MemLen - 1; i++)
+		ret.pMem[i] = ~pMem[i];
+
+	for (int i = (MemLen - 1)*32; i < BitLen; i++)
 	{
 		if (GetBit(i)) ret.ClrBit(i);
 		else ret.SetBit(i);
@@ -210,5 +204,7 @@ istream &operator>>(istream &istr, TBitField &bf) // ввод
 
 ostream &operator<<(ostream &ostr, const TBitField &bf) // вывод
 {
+	for (int i = 0; i < bf.BitLen; i++)
+		ostr << bf.GetBit(i);
 	return ostr;
 }
