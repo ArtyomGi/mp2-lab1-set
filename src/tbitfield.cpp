@@ -199,7 +199,6 @@ TBitField TBitField::operator~(void) // отрицание
 
 istream &operator>>(istream &istr, TBitField &bf) // ввод
 {
-	
 	return istr;
 }
 
